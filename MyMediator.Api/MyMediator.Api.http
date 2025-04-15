@@ -1,0 +1,6 @@
+@MyMediator.Api_HostAddress = http://localhost:5255
+
+GET {{MyMediator.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
