@@ -23,5 +23,4 @@ app.MapPost("/v1/accounts", async (IMediator mediator, CreatedAtActionResult com
     return Results.Ok(result);
 });
 
-
 app.Run();
