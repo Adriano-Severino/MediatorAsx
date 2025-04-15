@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MediatorAsx.Abstractions\MediatorAsx.Abstractions.csproj" />
     <ProjectReference Include="..\MediatorAsx\MediatorAsx.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -16,18 +16,60 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Adriano-Severino/MediatorAsx</RepositoryUrl>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!-- Dependências específicas para cada framework -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\MediatorAsx.Abstractions\MediatorAsx.Abstractions.csproj" />
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
 	</ItemGroup>
+
+	<!-- Referência de projeto com configuração adequada para empacotamento -->
+	<ItemGroup>
+		<ProjectReference Include="..\MediatorAsx.Abstractions\MediatorAsx.Abstractions.csproj">
+			<PrivateAssets>All</PrivateAssets>
+			<IncludeAssets>Runtime; Build; Native; ContentFiles; Analyzers</IncludeAssets>
+		</ProjectReference>
+	</ItemGroup>
+
+	<!-- Garantir que os assemblies sejam copiados para o pacote -->
+	<PropertyGroup>
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+	</PropertyGroup>
+
+	<!-- Target para incluir referências de projeto no pacote -->
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+		<ItemGroup>
+			<BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+		</ItemGroup>
+	</Target>
+
+	<!-- Target explícito para garantir inclusão de todos os frameworks -->
+	<Target Name="IncludeAllFrameworksInPackage" BeforeTargets="GenerateNuspec">
+		<Message Text="Garantindo a inclusão de todos os frameworks no pacote" Importance="high" />
+	</Target>
+
+	<!-- Target para copiar o pacote para a pasta de saída -->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<PropertyGroup>
+			<PackageFile>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(PackageId).$(Version).nupkg</PackageFile>
+		</PropertyGroup>
+		<MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
+		<Copy Condition="Exists('$(PackageFile)')"
+              SourceFiles="$(PackageFile)"
+              DestinationFolder="$(PackageOutputPath)" />
+	</Target>
 
 </Project>

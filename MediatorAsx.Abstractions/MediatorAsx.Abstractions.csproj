@@ -1,9 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Propriedades do NuGet completas para publicação separada -->
+		<PackageId>MediatorAsx.Abstractions</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Adriano Severino</Authors>
+		<Company>ASX Software Technology</Company>
+		<Description>Abstrações para o pacote MediatorAsx</Description>
+		<PackageTags>mediator;cqrs;abstractions</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/Adriano-Severino/MediatorAsx</RepositoryUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- Modificado para usar diretório fixo no projeto -->
+		<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>
+	</PropertyGroup>
+
+	<!-- Garantir que as compilações específicas para cada framework sejam explícitas -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>NETCORE;NET8_0</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+		<DefineConstants>NETCORE;NET9_0</DefineConstants>
+	</PropertyGroup>
+
+	<!-- Target modificado para criar diretório e verificar arquivo antes da cópia -->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<!-- Definir caminhos de forma mais precisa -->
+		<PropertyGroup>
+			<PackageSource>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(PackageId).$(Version).nupkg</PackageSource>
+		</PropertyGroup>
+
+		<!-- Criar diretório de saída se não existir -->
+		<MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
+
+		<!-- Mensagem de diagnóstico -->
+		<Message Text="Procurando pacote em: $(PackageSource)" Importance="high" />
+
+		<!-- Verificar existência e copiar se existir -->
+		<Warning Condition="!Exists('$(PackageSource)')" Text="Pacote não encontrado em: $(PackageSource)" />
+		<Copy Condition="Exists('$(PackageSource)')" SourceFiles="$(PackageSource)" DestinationFolder="$(PackageOutputPath)" />
+
+		<!-- Mensagem de confirmação -->
+		<Message Condition="Exists('$(PackageSource)')" Text="Pacote copiado com sucesso para: $(PackageOutputPath)" Importance="high" />
+	</Target>
 
 </Project>
