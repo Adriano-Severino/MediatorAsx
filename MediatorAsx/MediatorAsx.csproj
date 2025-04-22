@@ -7,7 +7,7 @@
 
 		<!-- Propriedades do NuGet -->
 		<PackageId>MediatorAsx</PackageId>
-		<Version>1.0.0</Version>
+		<Version>2.0.1</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Uma implementação simples do padrão Mediator para .NET</Description>
@@ -41,6 +41,9 @@
 			<IncludeAssets>Runtime; Build; Native; ContentFiles; Analyzers</IncludeAssets>
 		</ProjectReference>
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="nupkgs\" />
+	</ItemGroup>
 
 	<!-- Garantir que os assemblies sejam copiados para o pacote -->
 	<PropertyGroup>
@@ -67,9 +70,7 @@
 			<PackageFile>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(PackageId).$(Version).nupkg</PackageFile>
 		</PropertyGroup>
 		<MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
-		<Copy Condition="Exists('$(PackageFile)')"
-              SourceFiles="$(PackageFile)"
-              DestinationFolder="$(PackageOutputPath)" />
+		<Copy Condition="Exists('$(PackageFile)')" SourceFiles="$(PackageFile)" DestinationFolder="$(PackageOutputPath)" />
 	</Target>
 
 </Project>

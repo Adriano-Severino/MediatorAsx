@@ -8,7 +8,7 @@ namespace MediatorAsx
     {
         public static IServiceCollection AddMediator(this IServiceCollection services, params Assembly[] assemblies)
         {
-            services.AddSingleton<IMediator, Mediator>();
+            services.AddTransient<IMediator, Mediator>();
 
             var handlerTypes = typeof(IHandler<,>);
 

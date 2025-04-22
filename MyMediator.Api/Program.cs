@@ -14,7 +14,7 @@ builder.Services.AddApplication();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
+//minha api nuget "oy2ibm34ihmqc76h6lwqqcn3tmriurdenhuws3pivcqa3e"
 app.UseHttpsRedirection();
 
 app.MapPost("/v1/accounts", async (IMediator mediator, CreatedAtActionResult command) =>
