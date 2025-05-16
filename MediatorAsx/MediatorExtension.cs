@@ -10,10 +10,13 @@ namespace MediatorAsx
         {
             services.AddTransient<IMediator, Mediator>();
 
+            // Tipos de handlers
             var handlerTypes = typeof(IHandler<,>);
+            var notificationHandlerTypes = typeof(INotificationHandler<>);
 
             foreach (var assembly in assemblies)
             {
+                // Registrar handlers de requisição
                 var handlers = assembly.GetTypes()
                     .Where(type => !type.IsAbstract && !type.IsInterface)
                     .SelectMany(x => x.GetInterfaces(), (t, i) => new { type = t, Interface = i })
@@ -23,8 +26,18 @@ namespace MediatorAsx
                 {
                     services.AddTransient(handler.Interface, handler.type);
                 }
-            }
 
+                // Registrar handlers de notificação
+                var notificationHandlers = assembly.GetTypes()
+                    .Where(type => !type.IsAbstract && !type.IsInterface)
+                    .SelectMany(x => x.GetInterfaces(), (t, i) => new { type = t, Interface = i })
+                    .Where(ti => ti.Interface.IsGenericType && ti.Interface.GetGenericTypeDefinition() == notificationHandlerTypes);
+
+                foreach (var handler in notificationHandlers)
+                {
+                    services.AddTransient(handler.Interface, handler.type);
+                }
+            }
 
             return services;
         }
