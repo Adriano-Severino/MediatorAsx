@@ -7,7 +7,7 @@
 
 		<!-- Propriedades do NuGet -->
 		<PackageId>MediatorAsx</PackageId>
-		<Version>2.0.1</Version>
+		<Version>2.0.2</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Uma implementação simples do padrão Mediator para .NET</Description>
