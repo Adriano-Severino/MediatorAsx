@@ -7,7 +7,7 @@
 
 		<!-- Propriedades do NuGet -->
 		<PackageId>MediatorAsx</PackageId>
-		<Version>2.0.2</Version>
+		<Version>2.0.3</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Uma implementação simples do padrão Mediator para .NET</Description>
@@ -15,7 +15,10 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Adriano-Severino/MediatorAsx</RepositoryUrl>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://github.com/Adriano-Severino/MediatorAsx</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>

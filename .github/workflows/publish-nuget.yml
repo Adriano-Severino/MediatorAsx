@@ -1,0 +1,48 @@
+name: publish-nuget
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+jobs:
+  pack-and-publish:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore MediatorAsx.sln
+
+      - name: Pack Abstractions
+        run: dotnet pack MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj -c Release --no-restore
+
+      - name: Pack Core
+        run: dotnet pack MediatorAsx/MediatorAsx.csproj -c Release --no-restore
+
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $patterns = @(
+            'MediatorAsx.Abstractions/nupkgs/*.nupkg',
+            'MediatorAsx/nupkgs/*.nupkg',
+            'MediatorAsx.Abstractions/nupkgs/*.snupkg',
+            'MediatorAsx/nupkgs/*.snupkg'
+          )
+          foreach ($pattern in $patterns) {
+            Get-ChildItem $pattern -ErrorAction SilentlyContinue | ForEach-Object {
+              dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+            }
+          }

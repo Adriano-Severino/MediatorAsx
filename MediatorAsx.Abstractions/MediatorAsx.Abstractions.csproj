@@ -7,19 +7,27 @@
 
 		<!-- Propriedades do NuGet completas para publicação separada -->
 		<PackageId>MediatorAsx.Abstractions</PackageId>
-		<Version>2.0.1</Version>
+		<Version>2.0.2</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Abstrações para o pacote MediatorAsx</Description>
 		<PackageTags>mediator;cqrs;abstractions</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Adriano-Severino/MediatorAsx</RepositoryUrl>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://github.com/Adriano-Severino/MediatorAsx</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<!-- Modificado para usar diretório fixo no projeto -->
 		<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 	<!-- Garantir que as compilações específicas para cada framework sejam explícitas -->
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">

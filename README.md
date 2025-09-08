@@ -16,6 +16,35 @@ dotnet pack --configuration Release
 
 Os pacotes gerados estarão localizados nas pastas `nupkgs` dentro dos diretórios de cada projeto (`MediatorAsx/nupkgs` e `MediatorAsx.Abstractions/nupkgs`).
 
+## Publicação no NuGet.org (GitHub Actions)
+
+Este repositório possui um workflow pronto (`.github/workflows/publish-nuget.yml`) para publicar automaticamente no nuget.org.
+
+1) Configure o segredo no GitHub
+- Vá em Settings > Secrets and variables > Actions > New repository secret
+- Name: `NUGET_API_KEY`
+- Value: sua API key do nuget.org (escopo Push). Nunca commit sua chave no repositório.
+
+2) Dispare a publicação
+- Crie uma tag que comece com `v` (ex.: `v2.0.4`) e faça push, ou
+- Crie uma Release no GitHub usando essa tag, ou
+- Execute o workflow manualmente (Actions > publish-nuget > Run workflow).
+
+O workflow vai restaurar, empacotar e publicar os pacotes:
+- `MediatorAsx`
+- `MediatorAsx.Abstractions`
+
+3) Versionamento
+- Antes de taguear, atualize a versão nos arquivos de projeto:
+    - `MediatorAsx/MediatorAsx.csproj` (`<Version>...</Version>`)
+    - `MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj` (`<Version>...</Version>`)
+- Use versões sem sufixos já publicados no nuget.org para evitar conflitos.
+
+4) Boas práticas de segurança
+- Mantenha a API key apenas nos GitHub Secrets.
+- Evite colar chaves em issues, commits, PRs ou logs.
+
+
 ## Como usar
 
 ### 1. Instalação
