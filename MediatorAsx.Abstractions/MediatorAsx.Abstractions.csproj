@@ -7,7 +7,7 @@
 
 		<!-- Propriedades do NuGet completas para publicação separada -->
 		<PackageId>MediatorAsx.Abstractions</PackageId>
-		<Version>2.0.2</Version>
+		<Version>2.0.3</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Abstrações para o pacote MediatorAsx</Description>
