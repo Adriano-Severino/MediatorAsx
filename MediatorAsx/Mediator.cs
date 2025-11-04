@@ -1,5 +1,6 @@
 ﻿using MediatorAsx.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 
 namespace MediatorAsx
 {
@@ -17,15 +18,47 @@ namespace MediatorAsx
                 throw new InvalidOperationException($"Handler not found for {requestType}");
             }
 
-            var method = handlerType.GetMethod("HandleAsync");
-            if (method is null)
+            var handlerMethod = handlerType.GetMethod("HandleAsync");
+            if (handlerMethod is null)
                 throw new InvalidOperationException($"Method not found for {handlerType}");
 
-            var result = method.Invoke(handler, [request, cancellationToken]);
-            if (result is not Task<TResponse> task)
-                throw new InvalidOperationException($"Invalid returned unexpected type {result}");
+            RequestHandlerDelegate<TResponse> handlerDelegate = () =>
+            {
+                var handlerResult = handlerMethod.Invoke(handler, new object[] { request, cancellationToken });
+                if (handlerResult is not Task<TResponse> handlerTask)
+                    throw new InvalidOperationException($"Handler returned unexpected type {handlerResult}");
 
-            return await task;
+                return handlerTask;
+            };
+
+            var pipelineType = typeof(IPipelineBehavior<,>).MakeGenericType(requestType, typeof(TResponse));
+            var pipelineInstances = serviceProvider.GetServices(pipelineType).Cast<object>().ToArray();
+
+            if (pipelineInstances.Length is 0)
+            {
+                return await handlerDelegate();
+            }
+
+            var pipelineMethod = pipelineType.GetMethod("HandleAsync");
+            if (pipelineMethod is null)
+                throw new InvalidOperationException($"Pipeline method not found for {pipelineType}");
+
+            RequestHandlerDelegate<TResponse> next = handlerDelegate;
+
+            foreach (var pipeline in pipelineInstances.Reverse())
+            {
+                var currentNext = next;
+                next = () =>
+                {
+                    var pipelineResult = pipelineMethod.Invoke(pipeline, new object[] { request, currentNext, cancellationToken });
+                    if (pipelineResult is not Task<TResponse> pipelineTask)
+                        throw new InvalidOperationException($"Pipeline behavior {pipeline.GetType().Name} returned unexpected type {pipelineResult}");
+
+                    return pipelineTask;
+                };
+            }
+
+            return await next();
         }
 
         public async Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)

@@ -2,6 +2,11 @@
 
 MediatorAsx é uma implementação simples e leve do padrão Mediator para aplicações .NET, focada em desacoplamento e organização do código através de requisições e handlers.
 
+## Novidades recentes
+
+- **Pipeline behaviors** (`IPipelineBehavior<TRequest, TResponse>`): agora é possível envolver a execução dos handlers com comportamentos adicionais (logging, validação, métricas etc.).
+- **Projecto de testes samples** (`MediatorAsx.Samples.Tests`): inclui cenários cobrindo envio de requisições, publicação de notificações e execução da cadeia de pipelines.
+
 ## Requisitos
 
 - .NET SDK (versões 8.0 ou 9.0)
@@ -142,6 +147,42 @@ var result = await mediator.SendAsync(request);
 
 Console.WriteLine($"New product created: {result.Name} with price: {result.Price}");
 ```
+
+### 5. Adicionando Pipeline Behaviors
+
+Implemente `IPipelineBehavior<TRequest, TResponse>` para executar lógica antes e depois do handler. Todos os behaviors registrados no container são encadeados e executados na ordem de resolução (último registrado roda mais próximo do handler).
+
+```csharp
+public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
+{
+    public async Task<TResponse> HandleAsync(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Handling {Request}", typeof(TRequest).Name);
+        var response = await next();
+        logger.LogInformation("Handled {Request}", typeof(TRequest).Name);
+        return response;
+    }
+}
+
+// Registro automático via AddMediator, basta deixar o behavior no assembly escaneado.
+```
+
+Os testes em `MediatorAsx.Samples.Tests/PipelineBehaviorTests.cs` demonstram o encadeamento de múltiplos behaviors.
+
+## Testes
+
+Execute todos os cenários (incluindo os samples) com:
+
+```bash
+dotnet test
+```
+
+O projeto `MediatorAsx.Samples.Tests` garante que tanto os fluxos padrão (`SendAsync`, `PublishAsync`) quanto a composição de behaviors continuem funcionando.
 
 ## Licença
 
