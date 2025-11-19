@@ -6,10 +6,11 @@ MediatorAsx é uma implementação simples e leve do padrão Mediator para aplic
 
 - **Pipeline behaviors** (`IPipelineBehavior<TRequest, TResponse>`): agora é possível envolver a execução dos handlers com comportamentos adicionais (logging, validação, métricas etc.).
 - **Projecto de testes samples** (`MediatorAsx.Samples.Tests`): inclui cenários cobrindo envio de requisições, publicação de notificações e execução da cadeia de pipelines.
+- **Compatibilidade com .NET 10**: bibliotecas e projetos de exemplo agora são compilados para o .NET 10 além dos targets anteriores.
 
 ## Requisitos
 
-- .NET SDK (versões 8.0 ou 9.0)
+- .NET SDK (versões 8.0, 9.0 ou 10.0)
 
 ## Como gerar o pacote NuGet
 

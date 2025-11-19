@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
 		<!-- Propriedades do NuGet completas para publicação separada -->
 		<PackageId>MediatorAsx.Abstractions</PackageId>
-		<Version>2.0.3</Version>
+		<Version>2.1.0</Version>
 		<Authors>Adriano Severino</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Abstrações para o pacote MediatorAsx</Description>
@@ -36,6 +36,10 @@
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<DefineConstants>NETCORE;NET9_0</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<DefineConstants>NETCORE;NET10_0</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
