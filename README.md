@@ -1,70 +1,70 @@
 # MediatorAsx
 
-MediatorAsx é uma implementação simples e leve do padrão Mediator para aplicações .NET, focada em desacoplamento e organização do código através de requisições e handlers.
+MediatorAsx is a lightweight, no-nonsense implementation of the Mediator pattern for .NET applications. It focuses on decoupling and clean code organization through requests and handlers.
 
-## Novidades recentes
+## Latest updates
 
-- **Pipeline behaviors** (`IPipelineBehavior<TRequest, TResponse>`): agora é possível envolver a execução dos handlers com comportamentos adicionais (logging, validação, métricas etc.).
-- **Projecto de testes samples** (`MediatorAsx.Samples.Tests`): inclui cenários cobrindo envio de requisições, publicação de notificações e execução da cadeia de pipelines.
-- **Compatibilidade com .NET 10**: bibliotecas e projetos de exemplo agora são compilados para o .NET 10 além dos targets anteriores.
+- **Pipeline behaviors** (`IPipelineBehavior<TRequest, TResponse>`): wrap handler execution with cross-cutting concerns such as logging, validation, metrics, caching, etc.
+- **Sample test project** (`MediatorAsx.Samples.Tests`): covers request sending, notification publishing, and pipeline chaining scenarios.
+- **.NET 10 compatibility**: libraries and sample projects now target .NET 10 in addition to the previous frameworks.
 
-## Requisitos
+## Requirements
 
-- .NET SDK (versões 8.0, 9.0 ou 10.0)
+- .NET SDK (version 8.0, 9.0, or 10.0)
 
-## Como gerar o pacote NuGet
+## Building the NuGet packages
 
-Para gerar os pacotes NuGet (.nupkg) das bibliotecas `MediatorAsx` e `MediatorAsx.Abstractions`, navegue até o diretório raiz do projeto (`C:/Users/Adria/source/repos/Adriano-Severino/MediatorAsx/`) e execute o seguinte comando:
+To generate the NuGet packages (`.nupkg`) for `MediatorAsx` and `MediatorAsx.Abstractions`, go to the repo root (`C:/Users/Adria/source/repos/Adriano-Severino/MediatorAsx/`) and run:
 
 ```bash
 dotnet pack --configuration Release
 ```
 
-Os pacotes gerados estarão localizados nas pastas `nupkgs` dentro dos diretórios de cada projeto (`MediatorAsx/nupkgs` e `MediatorAsx.Abstractions/nupkgs`).
+The resulting packages will be placed inside each project’s `nupkgs` folder (`MediatorAsx/nupkgs` and `MediatorAsx.Abstractions/nupkgs`).
 
-## Publicação no NuGet.org (GitHub Actions)
+## Publishing to NuGet.org (GitHub Actions)
 
-Este repositório possui um workflow pronto (`.github/workflows/publish-nuget.yml`) para publicar automaticamente no nuget.org.
+This repository ships with a ready-to-go workflow (`.github/workflows/publish-nuget.yml`) that restores, packs, and publishes both packages to nuget.org.
 
-1) Configure o segredo no GitHub
-- Vá em Settings > Secrets and variables > Actions > New repository secret
+1) Configure the secret
+- GitHub Settings > Secrets and variables > Actions > New repository secret
 - Name: `NUGET_API_KEY`
-- Value: sua API key do nuget.org (escopo Push). Nunca commit sua chave no repositório.
+- Value: your nuget.org API key (Push scope). Never commit the key to the repo.
 
-2) Dispare a publicação
-- Crie uma tag que comece com `v` (ex.: `v2.0.4`) e faça push, ou
-- Crie uma Release no GitHub usando essa tag, ou
-- Execute o workflow manualmente (Actions > publish-nuget > Run workflow).
+2) Trigger the workflow
+- Push a tag that starts with `v` (e.g., `v2.1.0`), or
+- Create a GitHub Release with that tag, or
+- Run the workflow manually (Actions > publish-nuget > Run workflow).
 
-O workflow vai restaurar, empacotar e publicar os pacotes:
+The workflow publishes both packages:
 - `MediatorAsx`
 - `MediatorAsx.Abstractions`
 
-3) Versionamento
-- Antes de taguear, atualize a versão nos arquivos de projeto:
-    - `MediatorAsx/MediatorAsx.csproj` (`<Version>...</Version>`)
-    - `MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj` (`<Version>...</Version>`)
-- Use versões sem sufixos já publicados no nuget.org para evitar conflitos.
+3) Versioning checklist
+- Before tagging, update the `<Version>` property in:
+  - `MediatorAsx/MediatorAsx.csproj`
+  - `MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj`
+- Use unpublished version numbers on nuget.org to avoid conflicts.
 
-4) Boas práticas de segurança
-- Mantenha a API key apenas nos GitHub Secrets.
-- Evite colar chaves em issues, commits, PRs ou logs.
+4) Security best practices
+- Store your API key exclusively in GitHub Secrets.
+- Never paste keys into issues, commits, PRs, or logs.
 
 
-## Como usar
+## How to use
 
-### 1. Instalação
+### 1. Installation
 
-Adicione os pacotes `MediatorAsx` e `MediatorAsx.Abstractions` ao seu projeto via NuGet.
+Add both packages to your project via NuGet:
 
 ```bash
 dotnet add package MediatorAsx
 dotnet add package MediatorAsx.Abstractions
 ```
 
-### 2. Configuração da Injeção de Dependência
+### 2. Dependency Injection setup
 
-No seu `Program.cs` ou na classe de inicialização da sua aplicação, configure o Mediator e registre seus handlers:
+Configure the mediator and register your handlers in `Program.cs` (or your startup entry point):
 
 ```csharp
 using MediatorAsx;
@@ -73,25 +73,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-// Adiciona o Mediator e registra todos os handlers (IRequest, INotification) no assembly especificado.
-// Você pode passar typeof(Startup).Assembly ou typeof(Program).Assembly, dependendo da sua estrutura.
+// Adds the mediator and registers IRequest/INotification handlers from the provided assembly.
+// Plug in typeof(Startup).Assembly, typeof(Program).Assembly, or any assembly you want to scan.
 services.AddMediator(typeof(Program).Assembly);
 
-// Exemplo de registro de outras dependências
+// Example: register additional services
 services.AddSingleton<IProductRepository, ProductRepository>();
 
-var servicesProvider = services.BuildServiceProvider();
-var mediator = servicesProvider.GetRequiredService<IMediator>();
+var serviceProvider = services.BuildServiceProvider();
+var mediator = serviceProvider.GetRequiredService<IMediator>();
 
-// ... (veja o exemplo de uso abaixo)
+// ...continue with your app flow
 ```
 
-### 3. Definindo Requisições e Handlers
+### 3. Requests and handlers
 
-Crie suas classes de requisição (que implementam `IRequest<TResponse>`) e seus handlers correspondentes (que implementam `IHandler<TRequest, TResponse>`):
+Define your requests (`IRequest<TResponse>`) and their respective handlers (`IHandler<TRequest, TResponse>`):
 
 ```csharp
-// Requisição
+// Request
 public class CreateProductCommand : IRequest<Product>
 {
     public string Name { get; set; }
@@ -105,19 +105,18 @@ public class CreateProductCommandHandler(IProductRepository productRepository) :
     {
         Console.WriteLine($"Creating product: {request.Name} with price: {request.Price}");
         var result = await productRepository.Add(request);
-
         return result;
     }
 }
 
-// Exemplo de modelo de dados (Product.cs)
+// Data model sample (Product.cs)
 public class Product
 {
     public string Name { get; set; }
     public decimal Price { get; set; }
 }
 
-// Exemplo de repositório (IProductRepository.cs e ProductRepository.cs)
+// Repository sample (IProductRepository.cs and ProductRepository.cs)
 public interface IProductRepository
 {
     Task<Product> Add(CreateProductCommand product);
@@ -127,15 +126,15 @@ public class ProductRepository : IProductRepository
 {
     public Task<Product> Add(CreateProductCommand product)
     {
-        // Simula a adição ao banco de dados
+        // Simulate persistence
         return Task.FromResult(new Product { Name = product.Name, Price = product.Price });
     }
 }
 ```
 
-### 4. Enviando Requisições
+### 4. Sending requests
 
-Use a instância de `IMediator` para enviar suas requisições:
+Use `IMediator` to send commands/queries:
 
 ```csharp
 var request = new CreateProductCommand
@@ -149,9 +148,9 @@ var result = await mediator.SendAsync(request);
 Console.WriteLine($"New product created: {result.Name} with price: {result.Price}");
 ```
 
-### 5. Adicionando Pipeline Behaviors
+### 5. Adding pipeline behaviors
 
-Implemente `IPipelineBehavior<TRequest, TResponse>` para executar lógica antes e depois do handler. Todos os behaviors registrados no container são encadeados e executados na ordem de resolução (último registrado roda mais próximo do handler).
+Implement `IPipelineBehavior<TRequest, TResponse>` to execute logic before/after the handler. Behaviors are resolved and chained in registration order (the last registered behavior runs closest to the handler).
 
 ```csharp
 public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
@@ -170,21 +169,21 @@ public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior
     }
 }
 
-// Registro automático via AddMediator, basta deixar o behavior no assembly escaneado.
+// Registered automatically via AddMediator as long as the behavior lives in a scanned assembly.
 ```
 
-Os testes em `MediatorAsx.Samples.Tests/PipelineBehaviorTests.cs` demonstram o encadeamento de múltiplos behaviors.
+`MediatorAsx.Samples.Tests/PipelineBehaviorTests.cs` showcases multiple behaviors chained together.
 
-## Testes
+## Tests
 
-Execute todos os cenários (incluindo os samples) com:
+Run every scenario (samples included) with:
 
 ```bash
 dotnet test
 ```
 
-O projeto `MediatorAsx.Samples.Tests` garante que tanto os fluxos padrão (`SendAsync`, `PublishAsync`) quanto a composição de behaviors continuem funcionando.
+`MediatorAsx.Samples.Tests` ensures both the default flows (`SendAsync`, `PublishAsync`) and the pipeline composition keep working.
 
-## Licença
+## License
 
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
