@@ -286,4 +286,4 @@ Em ambientes onde callbacks ou ações assíncronas são executadas após opera�
 📄 Licença
 Este projeto está licenciado sob a Licença MIT.
 
-Desenvolvido por Adriano Severino
+Desenvolvido por Adriano Xavier
