@@ -2,7 +2,7 @@
 
 Interfaces base do MediatorAsx: IRequest<T>, IHandler<TReq, TRes>, INotification e INotificationHandler<T>.
 
-- Multi-target: .NET 8 e .NET 9
+- Multi-target: .NET 8, .NET 9, .NET 10 e .NET 11
 - Licença: MIT
 
 Uso típico:

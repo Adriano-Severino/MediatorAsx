@@ -26,7 +26,7 @@ Suporte completo para injeção de dependências
 
 Registro automático de handlers
 
-Suporte a multi-targeting (.NET 8.0 e .NET 9.0)
+Suporte a multi-targeting (.NET 8.0, .NET 9.0, .NET 10.0 e .NET 11.0)
 
 Zero dependências externas além das bibliotecas padrão do .NET
 
@@ -35,11 +35,15 @@ Zero dependências externas além das bibliotecas padrão do .NET
 
 .NET 9.0
 
+.NET 10.0
+
+.NET 11.0
+
 📦 Instalação
 Via Package Manager Console
 Install-Package MediatorAsx
 
-<PackageReference Include="MediatorAsx" Version="2.0.0" />
+<PackageReference Include="MediatorAsx" Version="2.2.0" />
 
 🚀 Como Usar
 Registro de Serviços

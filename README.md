@@ -6,11 +6,11 @@ MediatorAsx is a lightweight, no-nonsense implementation of the Mediator pattern
 
 - **Pipeline behaviors** (`IPipelineBehavior<TRequest, TResponse>`): wrap handler execution with cross-cutting concerns such as logging, validation, metrics, caching, etc.
 - **Sample test project** (`MediatorAsx.Samples.Tests`): covers request sending, notification publishing, and pipeline chaining scenarios.
-- **.NET 10 compatibility**: libraries and sample projects now target .NET 10 in addition to the previous frameworks.
+- **.NET 11 compatibility**: libraries and sample projects now support .NET 11 (STS) alongside .NET 8.0, 9.0, and 10.0.
 
 ## Requirements
 
-- .NET SDK (version 8.0, 9.0, or 10.0)
+- .NET SDK (version 8.0, 9.0, 10.0, or 11.0)
 
 ## Building the NuGet packages
 
@@ -26,13 +26,14 @@ The resulting packages will be placed inside each project’s `nupkgs` folder (`
 
 This repository ships with a ready-to-go workflow (`.github/workflows/publish-nuget.yml`) that restores, packs, and publishes both packages to nuget.org.
 
-1) Configure the secret
-- GitHub Settings > Secrets and variables > Actions > New repository secret
-- Name: `NUGET_API_KEY`
-- Value: your nuget.org API key (Push scope). Never commit the key to the repo.
+1) Configure Trusted Publishing (OIDC)
+- On nuget.org, configure Trusted Publishing for this GitHub repository and workflow.
+- GitHub Settings > Secrets and variables > Actions > New repository secret:
+  - Name: `NUGET_USER`
+  - Value: your nuget.org username/profile name. Never commit credentials to the repo.
 
 2) Trigger the workflow
-- Push a tag that starts with `v` (e.g., `v2.1.0`), or
+- Push a tag that starts with `v` (e.g., `v2.2.0`), or
 - Create a GitHub Release with that tag, or
 - Run the workflow manually (Actions > publish-nuget > Run workflow).
 

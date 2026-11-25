@@ -8,9 +8,16 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: publish-nuget-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   pack-and-publish:
     runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,21 +26,40 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            8.0.x
             9.0.x
             10.0.x
+            11.0.x
 
       - name: Restore
         run: dotnet restore MediatorAsx.sln
 
+      - name: Test
+        run: dotnet test MediatorAsx.sln -c Release --no-restore
+
+      - name: Get version from tag
+        id: get_version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -match '^refs/tags/v(.+)$') {
+            "VERSION=$($Matches[1])" >> $env:GITHUB_OUTPUT
+          } else {
+            "VERSION=2.2.0" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Pack Abstractions
-        run: dotnet pack MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj -c Release --no-restore
+        run: dotnet pack MediatorAsx.Abstractions/MediatorAsx.Abstractions.csproj -c Release --no-restore -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
 
       - name: Pack Core
-        run: dotnet pack MediatorAsx/MediatorAsx.csproj -c Release --no-restore
+        run: dotnet pack MediatorAsx/MediatorAsx.csproj -c Release --no-restore -p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: NuGet login (OIDC)
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
 
       - name: Publish to NuGet
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -45,6 +71,6 @@ jobs:
           )
           foreach ($pattern in $patterns) {
             Get-ChildItem $pattern -ErrorAction SilentlyContinue | ForEach-Object {
-              dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+              dotnet nuget push $_.FullName --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
             }
           }

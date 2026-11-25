@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
 		<!-- Propriedades do NuGet -->
 		<PackageId>MediatorAsx</PackageId>
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 		<Authors>Adriano Xavier</Authors>
 		<Company>ASX Software Technology</Company>
 		<Description>Uma implementação simples do padrão Mediator para .NET</Description>
@@ -28,8 +28,11 @@
 		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
-	<!-- Dependências compartilhadas -->
-	<ItemGroup>
+	<!-- Dependências por framework -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' != 'net11.0'">
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
 	</ItemGroup>
 
